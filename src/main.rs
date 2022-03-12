@@ -74,16 +74,19 @@ fn parse(path: impl AsRef<Path>) -> Result<Vec<Record>> {
             .map(|s| s.to_string());
         let line = name.clone();
         let pronunciation = "".into();
-        let category: Option<String> = {
+        let category: String = {
             let components: Option<Vec<_>> = relative_path
                 .components()
                 .map(|c| c.as_os_str().to_str())
                 .collect();
-            components.map(|v| v[0..v.len() - 1].join("/"))
+            components
+                .map(|v| v[0..v.len() - 1].join("/"))
+                .filter(|s| !s.is_empty())
+                .unwrap_or_else(|| "なし".into())
         };
 
         match (relative_path_str, name, line, pronunciation, category) {
-            (Some(relative_path), Some(name), Some(line), pronunciation, Some(category)) => {
+            (Some(relative_path), Some(name), Some(line), pronunciation, category) => {
                 records.push(Record {
                     relative_path,
                     name,
