@@ -50,7 +50,7 @@ fn get_sound_items(dir: &Path) -> Result<Vec<PathBuf>> {
 
     let mut result = Vec::new();
 
-    for f in globwalk::glob(pattern)?.into_iter() {
+    for f in globwalk::glob(pattern)? {
         let f = f?;
         result.push(f.into_path());
     }
@@ -62,7 +62,7 @@ fn parse(path: impl AsRef<Path>) -> Result<Vec<Record>> {
     let base_path = path.as_ref();
 
     let mut records = Vec::new();
-    let items = get_sound_items(&base_path)?;
+    let items = get_sound_items(base_path)?;
 
     for item in items {
         let relative_path = item.strip_prefix(base_path)?;
@@ -85,17 +85,16 @@ fn parse(path: impl AsRef<Path>) -> Result<Vec<Record>> {
                 .unwrap_or_else(|| "なし".into())
         };
 
-        match (relative_path_str, name, line, pronunciation, category) {
-            (Some(relative_path), Some(name), Some(line), pronunciation, category) => {
-                records.push(Record {
-                    relative_path,
-                    name,
-                    line,
-                    pronunciation,
-                    category,
-                });
-            }
-            _ => {}
+        if let (Some(relative_path), Some(name), Some(line), pronunciation, category) =
+            (relative_path_str, name, line, pronunciation, category)
+        {
+            records.push(Record {
+                relative_path,
+                name,
+                line,
+                pronunciation,
+                category,
+            });
         }
     }
 
